@@ -5,6 +5,12 @@
 # Executabilul publicat — regenerabil prin src\publish.ps1
 /NttoSaga.exe
 
+# Pachet de instalare asamblat (conține executabilul) — regenerabil prin src\pachet-instalare.ps1
+/instalare/
+
+# Fișiere DBF generate de aplicație la export (nu fixture de test — acela e IN_..._NT_index.dbf)
+/files/IN_*_NT_[0-9]*.dbf
+
 # Date create automat de aplicație la rulare (nu fac parte din codul sursă)
 /data/
 /backup/

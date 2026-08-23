@@ -1,0 +1,53 @@
+GHID DE INSTALARE — NT to SAGA
+================================
+
+Ce trebuie sa faceti (o singura data, pe fiecare calculator unde va fi
+folosita aplicatia):
+
+1. Copiati intregul folder de instalare (cu tot ce contine: Instaleaza.bat,
+   install.ps1, NttoSaga.exe, acest ghid) pe calculatorul tinta — de pe un
+   stick USB, din retea, sau prin e-mail/cloud. Nu copiati doar un fisier,
+   ci tot folderul.
+
+2. In folderul copiat, faceti dublu-clic pe fisierul "Instaleaza.bat".
+   - Daca Windows arata un avertisment ("Windows a protejat PC-ul" /
+     SmartScreen), apasati "More info" ("Mai multe informatii") si apoi
+     "Run anyway" ("Executare oricum"). Este normal pentru fisiere care nu
+     au fost descarcate de pe internet cu semnatura digitala.
+
+3. Se deschide o fereastra neagra care afiseaza pasii instalarii. Asteptati
+   mesajul "Instalare finalizata cu succes." si apasati Enter pentru a
+   inchide fereastra.
+
+CE S-A INTAMPLAT:
+   - Aplicatia a fost copiata in D:\nttosaga\NttoSaga.exe
+   - A aparut o comanda rapida pe desktop: "NT to SAGA"
+
+   NOTA IMPORTANTA: calculatorul trebuie sa aiba o unitate D: (disc sau
+   partitie D:). Daca instalarea se opreste cu un mesaj despre lipsa
+   unitatii D:, anuntati persoana care a pregatit instalarea.
+
+CUM PORNITI APLICATIA:
+   - Dublu-clic pe comanda rapida "NT to SAGA" de pe desktop.
+   - La prima pornire, aplicatia isi creeaza singura toate folderele si
+     baza de date necesare — nu trebuie sa faceti nimic special.
+
+UNDE PUNETI FISIERELE CSV DE IMPORT:
+   - D:\nttosaga\files
+   - Fisierele CSV exportate din sistemul de gestiune se pun aici; din
+     aplicatie, din ecranul "Import CSV", alegeti fisierul de acolo (sau
+     il trageti direct in fereastra aplicatiei).
+
+DACA CEVA NU MERGE:
+   - Verificati fisierele din D:\nttosaga\log (jurnalul zilnic) — acolo
+     apar mesaje despre ce s-a intamplat.
+   - Aplicatia face automat o copie de siguranta a bazei de date inainte
+     de fiecare import si export, in D:\nttosaga\backup — datele nu se
+     pierd usor.
+
+PENTRU ACTUALIZAREA APLICATIEI PE UN CALCULATOR UNDE E DEJA INSTALATA:
+   - Inchideti aplicatia NT to SAGA daca este deschisa.
+   - Rulati din nou "Instaleaza.bat", de data aceasta cu noul folder de
+     instalare (cu o versiune mai noua de NttoSaga.exe).
+   - Datele importate si exporturile facute anterior raman neatinse —
+     instalarea inlocuieste doar aplicatia, nu si baza de date.
