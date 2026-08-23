@@ -1,0 +1,120 @@
+Furnizori
+Nr. crt. Nume câmp Tip Mărime câmp Descriere
+1. COD Character 8 Cod furnizor
+2. DENUMIRE Character 48 Denumire furnizor
+3. COD_FISCAL Character 13 Cod Fiscal, furnizor
+4. ANALITIC Character 16 Cont analitic
+5. ZS Numeric 3 Zile Scadenţă
+6. ADRESA Character 48 Adresa
+7. BANCA Character 48 Banca
+8. CONT_BANCA Character 36 Contul bancar
+9. FILIALA Character 36 Filiala Banca
+10. GRUPA Character 16 Grupa
+
+
+Numele fişierului trebuie să fie în formatul următor: Furnizori_<data-început>_<data- sfârşit>.dbf
+
+
+Clienţi
+Nr. crt. Nume câmp Tip Mărime câmp Descriere
+1. COD Character 8 Cod client
+2. DENUMIRE Character 48 Denumire furnizor
+3. COD_FISCAL Character 16 Cod Fiscal, client
+4. REG_COM Character 16 Nr.înregistrare la Registrul Comerţului
+5. ANALITIC Character 16 Cont analitic
+6. ZS Numeric 3 Zile Scadenţă
+7. DISCOUNT Numeric 5,2 Procent de discount acordat
+8. ADRESA Character 48 Adresa
+9. JUDET Character 36 Judeţ
+10. BANCA Character 36 Banca
+11. CONT_BANCA Character 36 Contul bancar
+12. EXTERN Logical - True, dacă este client extern
+13. DELEGAT Character 36 Numele şi prenumele delegatului
+14. BI_SERIE Character 2 Seria actului de identitate a delegatului
+15. BI_NUMAR Character 8 Număr act identitate, a delegatului
+16. BI_POL Character 16 Eliberat de...
+17. MASINA Character 16 Număr maşină delegat
+
+
+
+Numele fişierului trebuie să fie în formatul următor: Clienti_<data-inceput>_<data-sfarsit>.dbf
+
+
+Articole
+Nr. crt. Nume câmp Tip Mărime câmp Descriere
+1. COD Character 16 Cod articol
+2. DENUMIRE Character 60 Denumire articol
+3. UM Character 5 Unitate de masura
+4. TVA Numeric 5,2 Procent TVA articol
+5. TIP Character 2 Cod tip
+6. DEN_TIP Character 36 Denumire tip
+7. PRET_VANZ Numeric 15,4 Pret de vanzare fara TVA
+8. PRET_V_TVA Numeric 15,4 Pret de vanzare cu TVA
+9. COD_BARE Character 16 Cod de bare
+10. CANT_MIN Numeric 14,3 Stoc minim
+
+
+Numele fişierului trebuie să fie în formatul următor: Articole_<data-început>_<data-sfârşit>.dbf
+
+
+Articole contabile
+Nr. crt. Nume câmp Tip Mărime câmp Descriere
+1. NDP Character 10 Număr articol contabil
+2. CONT_D Character 20 Contul debitor
+3. CONT_C Character 20 Contul creditor
+4. SUMA Numeric 15,2 Suma înregistrată cu articolul contabil
+5. CURS Numeric 15,4 Curs valutar - opţional
+6. SUMA_VAL Numeric 14,2 Suma în valută, opţională
+7. DATA Date - Data articolului contabil
+8. EXPLICATIE Character 48 Explicaţie, articol contabil
+9. GRUPA Character 16 Grupa asociată
+
+
+
+Numele fişierului trebuie să fie în formatul următor: NC_<data-inceput>_<data-sfarsit>.dbf
+
+
+Intrări
+Nr. crt. Nume câmp Tip Mărime câmp Descriere
+1. NR_NIR Numeric 10 Număr NIR
+2. NR_INTRARE Character 12 Numărul documentului de intrare
+3. COD Character 8 Cod furnizor
+4. DATA Date - Data documentului de intrare (a facturii)
+5. SCADENT Date - Data scadenţei
+6. TIP Character 1 "A" - pentru aviz, "T" - taxare inversă...
+7. COD_ART Character 16 Cod articol
+8. DEN_ART Character 60 Denumire articol
+9. UM Character 5 Unitatea de măsură pt.articol
+10. CANTITATE Numeric 14,3 Cantitate
+11. TVA_ART Numeric 2 Procentul de TVA
+12. VALOARE Numeric 15,2 Valoarea totală, fără TVA
+13. TVA Numeric 15,2 TVA total
+14. CONT Character 20 Contul corespondent
+15. PRET_VANZ Numeric 15,2 Preţul de vânzare, numai pentru marfă
+
+
+
+Numele fişierului trebuie să fie în formatul următor: IN_<data-inceput>_<data-sfarsit>.dbf
+Fişierul va conţine câte o înregistrare pentru fiecare articol din factură.
+
+
+Ieşiri
+Nr. crt. Nume câmp Tip Mărime câmp Descriere
+1. NR_IESIRE Character 12 Numărul documentului de ieşire, bon
+2. COD Character 8 Cod client
+3. DATA Date - Data documentului de ieşire
+4. SCADENT Date - Data scadenţei
+5. TIP Character 1 "A" - pentru aviz, "T" - taxare inversă...
+6. COD_ART Character 16 Cod articol
+7. DEN_ART Character 60 Denumire articol
+8. UM Character 5 Unitatea de măsură pt.articol
+9. CANTITATE Numeric 14,3 Cantitate
+10. TVA_ART Numeric 2 Procentul de TVA
+11. VALOARE Numeric 15,2 Valoarea totală, fără TVA
+12. TVA Numeric 15,2 TVA total
+13. CONT Character 20 Contul corespondent
+14. PRET_VANZ Numeric 15,2 Preţul de vânzare
+
+
+
+Numele fişierului trebuie să fie în formatul următor: IE_<data-inceput>_<data-sfarsit>.dbf. Fişierul va conţine câte o înregistrare pentru fiecare articol din factură.

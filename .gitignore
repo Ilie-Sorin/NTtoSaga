@@ -1,0 +1,15 @@
+# Artefacte de build .NET
+[Bb]in/
+[Oo]bj/
+
+# Executabilul publicat — regenerabil prin src\publish.ps1
+/NttoSaga.exe
+
+# Date create automat de aplicație la rulare (nu fac parte din codul sursă)
+/data/
+/backup/
+/log/
+
+# Fișiere locale specifice utilizatorului/uneltei
+*.csproj.user
+/.claude/
