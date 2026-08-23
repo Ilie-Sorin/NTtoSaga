@@ -1,4 +1,4 @@
-# Publică NttoSaga.App ca executabil autonom (single-file) și îl copiază în rădăcina d:\nttosaga.
+# Publica NttoSaga.App ca executabil autonom (single-file) si il copiaza in radacina d:\nttosaga.
 $ErrorActionPreference = "Stop"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $proj = Join-Path $scriptDir "NttoSaga.App\NttoSaga.App.csproj"

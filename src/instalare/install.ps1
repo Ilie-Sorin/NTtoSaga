@@ -1,4 +1,4 @@
-# Instalează/actualizează NT to SAGA pe acest calculator.
+# Instaleaza/actualizeaza NT to SAGA pe acest calculator.
 # Rulat de obicei prin dublu-clic pe Instaleaza.bat, nu direct.
 $ErrorActionPreference = "Stop"
 
@@ -56,7 +56,7 @@ Write-Host "Aplicatia a fost copiata in: $tinta\NttoSaga.exe"
 if ($scurtaturaCreata) {
     Write-Host "A fost creata o comanda rapida pe desktop: 'NT to SAGA'."
 } else {
-    Write-Host "Nu am putut crea comanda rapida pe desktop — porniti aplicatia direct din $tinta\NttoSaga.exe"
+    Write-Host "Nu am putut crea comanda rapida pe desktop - porniti aplicatia direct din $tinta\NttoSaga.exe"
 }
 Write-Host ""
 Write-Host "Fisierele CSV de import se pun in: $tinta\files"
