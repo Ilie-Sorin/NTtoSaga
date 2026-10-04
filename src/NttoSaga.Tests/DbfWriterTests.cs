@@ -36,6 +36,12 @@ public class DbfWriterTests
 
         var inregistrari = DbfRecordBuilder.Construieste([linie], gestiuni, denumiriTva, setari);
 
+        // Formula corectă a TVA (TVA_ART aplicat la ValAchizitieFaraTVAIesire, rotunjit la 2 zecimale):
+        // 21% din 542.37 lei = 113.90 lei — NU 252.99 lei (ValVatAmIesire, din vânzarea cu amănuntul,
+        // fără legătură cu baza de calcul a transferului între gestiuni).
+        Assert.Equal(-113.90m, inregistrari[0].Tva);
+        Assert.Equal(113.90m, inregistrari[1].Tva);
+
         var caleTemp = Path.Combine(Path.GetTempPath(), $"nttosaga_test_{Guid.NewGuid():N}.dbf");
         try
         {
@@ -44,13 +50,34 @@ public class DbfWriterTests
             var generat = File.ReadAllBytes(caleTemp);
             var exemplu = File.ReadAllBytes(FisierExemplu);
 
-            Assert.Equal(exemplu.Length, generat.Length);
-            Assert.Equal(exemplu, generat);
+            // Fișierul-exemplu real conține valoarea veche, greșită, a TVA (252.99 lei). Formatul
+            // (antet, descriptori câmp, toate celelalte câmpuri) trebuie să rămână identic octet-cu-octet;
+            // doar cele două zone ale câmpului TVA sunt recalculate aici la valoarea corectă, înainte
+            // de comparație, ca testul să continue să garanteze compatibilitatea binară cu SAGA.
+            var asteptat = (byte[])exemplu.Clone();
+            PatchTvaField(asteptat, randIndex: 0, textNou: "-113.90");
+            PatchTvaField(asteptat, randIndex: 1, textNou: "113.90");
+
+            Assert.Equal(asteptat.Length, generat.Length);
+            Assert.Equal(asteptat, generat);
         }
         finally
         {
             if (File.Exists(caleTemp)) File.Delete(caleTemp);
         }
+    }
+
+    private const int LungimeAntetExemplu = 673;
+    private const int LungimeInregistrareExemplu = 310;
+    private const int OffsetTvaInInregistrare = 244; // 1 (marcaj șters) + suma lungimilor câmpurilor înaintea TVA
+    private const int LungimeCampTva = 15;
+
+    private static void PatchTvaField(byte[] bytes, int randIndex, string textNou)
+    {
+        var start = LungimeAntetExemplu + randIndex * LungimeInregistrareExemplu + OffsetTvaInInregistrare;
+        var text = textNou.PadLeft(LungimeCampTva);
+        var octetiNoi = System.Text.Encoding.ASCII.GetBytes(text);
+        Array.Copy(octetiNoi, 0, bytes, start, LungimeCampTva);
     }
 
     [Fact]

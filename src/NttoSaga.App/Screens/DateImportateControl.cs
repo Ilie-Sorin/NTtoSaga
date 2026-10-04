@@ -16,7 +16,8 @@ public class DateImportateControl : UserControl, Forms.IEcranNavigabil
     private readonly DateTimePicker _dtSfarsit = new() { Width = 110, Format = DateTimePickerFormat.Short };
     private readonly TextBox _txtCautare = new() { Width = 140, PlaceholderText = "Nr. document…" };
     private readonly Button _btnFiltreaza = new() { Text = "Filtrează", Width = 90 };
-    private readonly Button _btnSterge = new() { Text = "Șterge linia selectată", Width = 170 };
+    private readonly Button _btnSelecteazaTot = new() { Text = "Selectează tot", Width = 110 };
+    private readonly Button _btnSterge = new() { Text = "Șterge înregistrările selectate", Width = 200 };
 
     private readonly DataGridView _grid = new();
     private readonly Label _lblTotaluri = new();
@@ -54,8 +55,10 @@ public class DateImportateControl : UserControl, Forms.IEcranNavigabil
         _txtCautare.Margin = new Padding(10, 4, 4, 0);
         filtre.Controls.Add(_btnFiltreaza);
         _btnFiltreaza.Margin = new Padding(10, 4, 4, 0);
+        filtre.Controls.Add(_btnSelecteazaTot);
+        _btnSelecteazaTot.Margin = new Padding(20, 4, 4, 0);
         filtre.Controls.Add(_btnSterge);
-        _btnSterge.Margin = new Padding(20, 4, 4, 0);
+        _btnSterge.Margin = new Padding(4, 4, 4, 0);
         root.Controls.Add(filtre, 0, 1);
 
         _grid.Dock = DockStyle.Fill;
@@ -64,7 +67,7 @@ public class DateImportateControl : UserControl, Forms.IEcranNavigabil
         _grid.AllowUserToDeleteRows = false;
         _grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        _grid.MultiSelect = false;
+        _grid.MultiSelect = true;
         root.Controls.Add(_grid, 0, 2);
 
         _lblTotaluri.Dock = DockStyle.Fill;
@@ -75,6 +78,7 @@ public class DateImportateControl : UserControl, Forms.IEcranNavigabil
         Controls.Add(root);
 
         _btnFiltreaza.Click += (s, e) => Filtreaza();
+        _btnSelecteazaTot.Click += (s, e) => _grid.SelectAll();
         _btnSterge.Click += (s, e) => StergeSelectia();
         _txtCautare.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) Filtreaza(); };
     }
@@ -121,17 +125,18 @@ public class DateImportateControl : UserControl, Forms.IEcranNavigabil
         string? dataSfarsit = _chkInterval.Checked ? _dtSfarsit.Value.ToString("yyyy-MM-dd") : null;
 
         var linii = _liniiRepo.Cauta(gestiuni, dataStart, dataSfarsit, doarNeexportate, cota, _txtCautare.Text);
+        var gestiuniNomenclator = _nomenclatoare.ListeazaGestiuni();
 
         _grid.DataSource = linii.Select(l => new
         {
             l.Id,
             Gestiune_sursa = l.Name,
             Gestiune_destinatie = l.PartnerName,
-            NrDocument = l.DocNumber,
+            NrDocument = $"{NomenclatoareRepository.Gaseste(gestiuniNomenclator, l.Name)?.Prescurtare}{l.DocNumber}",
             Data = l.DocDate,
             Cota_TVA = l.RetailVatPercent,
             ValoareVanzare = l.ValAmIesire / 100m,
-            TVA = l.ValVatAmIesire / 100m,
+            TVA = l.TvaCalculata / 100m,
             ValoareAchizitie = l.ValAchizitieFaraTVAIesire / 100m,
             Export = l.IdExport?.ToString() ?? "neexportat",
         }).ToList();
@@ -139,32 +144,54 @@ public class DateImportateControl : UserControl, Forms.IEcranNavigabil
         if (_grid.Columns["Id"] is { } colId) colId.Visible = false;
 
         _lblTotaluri.Text = $"{linii.Count} linii · Total valoare vânzare: {linii.Sum(l => l.ValAmIesire) / 100m:N2} lei · " +
-                             $"Total TVA: {linii.Sum(l => l.ValVatAmIesire) / 100m:N2} lei";
+                             $"Total TVA: {linii.Sum(l => l.TvaCalculata) / 100m:N2} lei";
     }
 
     private void StergeSelectia()
     {
-        if (_grid.CurrentRow is null)
+        var linii = _grid.SelectedRows.Cast<DataGridViewRow>()
+            .Where(r => !r.IsNewRow)
+            .Select(r => (Id: (long)r.Cells["Id"].Value, Export: r.Cells["Export"].Value?.ToString()))
+            .ToList();
+        if (linii.Count == 0)
         {
-            MessageBox.Show(this, "Selectați o linie din tabel.", "Nicio selecție", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return;
-        }
-        var id = (long)_grid.CurrentRow.Cells["Id"].Value;
-        var export = _grid.CurrentRow.Cells["Export"].Value?.ToString();
-        if (export != "neexportat")
-        {
-            MessageBox.Show(this, "Linia a fost deja exportată — nu poate fi ștearsă.", "Ștergere respinsă", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(this, "Selectați cel puțin o linie din tabel.", "Nicio selecție", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
-        var confirmare = MessageBox.Show(this, "Ștergeți definitiv linia selectată?", "Confirmare ștergere",
-            MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        var nrExportate = linii.Count(l => l.Export != "neexportat");
+
+        string mesaj;
+        if (linii.Count == 1)
+        {
+            mesaj = nrExportate == 1
+                ? $"Linia selectată a fost deja EXPORTATĂ (exportul #{linii[0].Export}).\n\n" +
+                  "Ștergerea NU modifică fișierul DBF deja generat — dacă acel fișier a fost deja importat în SAGA, " +
+                  "corectarea de acolo trebuie făcută manual.\n\nȘtergeți definitiv linia selectată?"
+                : "Ștergeți definitiv linia selectată?";
+        }
+        else
+        {
+            mesaj = nrExportate > 0
+                ? $"Ați selectat {linii.Count} linii, dintre care {nrExportate} au fost deja EXPORTATE.\n\n" +
+                  "Ștergerea NU modifică fișierele DBF deja generate — dacă acele fișiere au fost deja importate în SAGA, " +
+                  $"corectarea de acolo trebuie făcută manual.\n\nȘtergeți definitiv cele {linii.Count} linii selectate?"
+                : $"Ștergeți definitiv cele {linii.Count} linii selectate?";
+        }
+
+        var confirmare = MessageBox.Show(this, mesaj, "Confirmare ștergere",
+            MessageBoxButtons.YesNo, nrExportate > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Question);
         if (confirmare != DialogResult.Yes) return;
 
-        if (_liniiRepo.Sterge(id))
+        foreach (var l in linii)
         {
-            FileLogger.Info($"Linie import #{id} ștearsă manual din ecranul Date importate.");
-            Filtreaza();
+            if (_liniiRepo.Sterge(l.Id))
+            {
+                FileLogger.Info($"Linie import #{l.Id} ștearsă manual din ecranul Date importate" +
+                                 (l.Export != "neexportat" ? $" (era exportată în exportul #{l.Export})." : "."));
+            }
         }
+
+        Filtreaza();
     }
 }

@@ -156,7 +156,7 @@ public class ImportCsvControl : UserControl, Forms.IEcranNavigabil
             Data = r.DocDateAfisare,
             Cota_TVA = r.RetailVatPercent,
             ValoareVanzare = r.ValAmIesireBani / 100m,
-            TVA = r.ValVatAmIesireBani / 100m,
+            TVA = Core.Models.TvaCalculator.CalculeazaTvaBani(r.RetailVatPercent, r.ValAchizitieFaraTVAIesireBani) / 100m,
             ValoareAchizitie = r.ValAchizitieFaraTVAIesireBani / 100m,
         }).ToList();
 

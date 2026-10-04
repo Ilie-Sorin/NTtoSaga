@@ -94,7 +94,7 @@ public class ExportService
             NrInregistrari = linii.Count,
             NrLiniiDbf = inregistrari.Count,
             TotalValoare = linii.Sum(l => l.ValAmIesire),
-            TotalTva = linii.Sum(l => l.ValVatAmIesire),
+            TotalTva = linii.Sum(l => l.TvaCalculata),
             Observatii = observatii ?? "",
         };
         _exporturiRepo.Finalizeaza(conn, tx, export);

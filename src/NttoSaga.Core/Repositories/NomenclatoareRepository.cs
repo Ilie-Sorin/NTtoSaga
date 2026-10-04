@@ -10,8 +10,8 @@ public class NomenclatoareRepository
         using var conn = Data.Database.OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = doarActive
-            ? "SELECT id, denumire, cont_marfa, activitate, activ FROM nomenclator_gestiuni WHERE activ = 1 ORDER BY denumire;"
-            : "SELECT id, denumire, cont_marfa, activitate, activ FROM nomenclator_gestiuni ORDER BY denumire;";
+            ? "SELECT id, denumire, cont_marfa, activitate, activ, prescurtare FROM nomenclator_gestiuni WHERE activ = 1 ORDER BY denumire;"
+            : "SELECT id, denumire, cont_marfa, activitate, activ, prescurtare FROM nomenclator_gestiuni ORDER BY denumire;";
         using var reader = cmd.ExecuteReader();
         var result = new List<NomenclatorGestiune>();
         while (reader.Read())
@@ -23,6 +23,7 @@ public class NomenclatoareRepository
                 ContMarfa = reader.GetString(2),
                 Activitate = reader.GetString(3),
                 Activ = reader.GetInt64(4) != 0,
+                Prescurtare = reader.GetString(5),
             });
         }
         return result;
@@ -36,33 +37,35 @@ public class NomenclatoareRepository
             string.Equals(g.Denumire.Trim(), cautat, StringComparison.OrdinalIgnoreCase));
     }
 
-    public void Adauga(string denumire, string contMarfa, string activitate)
+    public void Adauga(string denumire, string contMarfa, string activitate, string prescurtare = "")
     {
         using var conn = Data.Database.OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = """
-            INSERT INTO nomenclator_gestiuni (denumire, cont_marfa, activitate, activ)
-            VALUES ($denumire, $cont, $act, 1);
+            INSERT INTO nomenclator_gestiuni (denumire, cont_marfa, activitate, activ, prescurtare)
+            VALUES ($denumire, $cont, $act, 1, $prescurtare);
             """;
         cmd.Parameters.AddWithValue("$denumire", denumire.Trim());
         cmd.Parameters.AddWithValue("$cont", contMarfa.Trim());
         cmd.Parameters.AddWithValue("$act", activitate.Trim());
+        cmd.Parameters.AddWithValue("$prescurtare", prescurtare.Trim());
         cmd.ExecuteNonQuery();
     }
 
-    public void Actualizeaza(long id, string denumire, string contMarfa, string activitate, bool activ)
+    public void Actualizeaza(long id, string denumire, string contMarfa, string activitate, bool activ, string prescurtare)
     {
         using var conn = Data.Database.OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = """
             UPDATE nomenclator_gestiuni
-            SET denumire = $denumire, cont_marfa = $cont, activitate = $act, activ = $activ
+            SET denumire = $denumire, cont_marfa = $cont, activitate = $act, activ = $activ, prescurtare = $prescurtare
             WHERE id = $id;
             """;
         cmd.Parameters.AddWithValue("$denumire", denumire.Trim());
         cmd.Parameters.AddWithValue("$cont", contMarfa.Trim());
         cmd.Parameters.AddWithValue("$act", activitate.Trim());
         cmd.Parameters.AddWithValue("$activ", activ ? 1 : 0);
+        cmd.Parameters.AddWithValue("$prescurtare", prescurtare.Trim());
         cmd.Parameters.AddWithValue("$id", id);
         cmd.ExecuteNonQuery();
     }

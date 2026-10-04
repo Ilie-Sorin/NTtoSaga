@@ -8,7 +8,7 @@ public class ExportPreview
     public int NumarInregistrari => Linii.Count;
     public int NumarLiniiDbf => Linii.Count * 2;
     public long TotalValoare => Linii.Sum(l => l.ValAmIesire);
-    public long TotalTva => Linii.Sum(l => l.ValVatAmIesire);
+    public long TotalTva => Linii.Sum(l => l.TvaCalculata);
     public int NumarLiniiDejaExportate => Linii.Count(l => l.EsteExportata);
 }
 

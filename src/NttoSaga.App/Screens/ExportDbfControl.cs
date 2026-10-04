@@ -190,6 +190,7 @@ public class ExportDbfControl : UserControl, Forms.IEcranNavigabil
 
         var preview = _exportService.Previzualizeaza(gestiuni, _dtStart.Value, _dtSfarsit.Value, _chkDoarNeexportate.Checked);
         _liniiCurente = preview.Linii;
+        var gestiuniNomenclator = _nomenclatoare.ListeazaGestiuni();
 
         _gridPreviz.DataSource = _liniiCurente
             .OrderBy(l => l.Name).ThenBy(l => l.DocDate).ThenBy(l => l.DocNumber)
@@ -197,11 +198,11 @@ public class ExportDbfControl : UserControl, Forms.IEcranNavigabil
             {
                 Gestiune_sursa = l.Name,
                 Gestiune_destinatie = l.PartnerName,
-                NrDocument = l.DocNumber,
+                NrDocument = $"{NomenclatoareRepository.Gaseste(gestiuniNomenclator, l.Name)?.Prescurtare}{l.DocNumber}",
                 Data = l.DocDate,
                 Cota_TVA = l.RetailVatPercent,
                 ValoareVanzare = l.ValAmIesire / 100m,
-                TVA = l.ValVatAmIesire / 100m,
+                TVA = l.TvaCalculata / 100m,
                 Export = l.IdExport?.ToString() ?? "neexportat",
             }).ToList();
 

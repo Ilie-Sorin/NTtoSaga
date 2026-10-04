@@ -49,12 +49,13 @@ public static class DbfRecordBuilder
 
             var data = DateTime.ParseExact(linie.DocDate, "yyyy-MM-dd", null);
             var valoare = linie.ValAchizitieFaraTVAIesire / 100m;
-            var tva = linie.ValVatAmIesire / 100m;
+            var tva = linie.TvaCalculata / 100m;
             var pretVanz = linie.ValAmIesire / 100m;
+            var nrDocument = $"{sursa.Prescurtare}{linie.DocNumber}";
 
             rezultat.Add(new DbfNtRecord
             {
-                NrIntrare = linie.DocNumber,
+                NrIntrare = nrDocument,
                 Cod = setari.Cod,
                 Data = data,
                 Tip = setari.Tip,
@@ -71,7 +72,7 @@ public static class DbfRecordBuilder
 
             rezultat.Add(new DbfNtRecord
             {
-                NrIntrare = linie.DocNumber,
+                NrIntrare = nrDocument,
                 Cod = setari.Cod,
                 Data = data,
                 Tip = setari.Tip,

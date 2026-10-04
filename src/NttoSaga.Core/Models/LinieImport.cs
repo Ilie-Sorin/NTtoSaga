@@ -19,6 +19,9 @@ public class LinieImport
 
     public bool EsteExportata => IdExport.HasValue;
 
+    /// <summary>TVA corect de export — vezi <see cref="TvaCalculator"/>. Rezultat în bani, ca ValAmIesire/ValVatAmIesire.</summary>
+    public long TvaCalculata => TvaCalculator.CalculeazaTvaBani(RetailVatPercent, ValAchizitieFaraTVAIesire);
+
     /// <summary>Compară valorile economice (nu id/metadate) — folosit la reimport (D3).</summary>
     public bool AreAceleasiValori(LinieImport other) =>
         ValAmIesire == other.ValAmIesire &&

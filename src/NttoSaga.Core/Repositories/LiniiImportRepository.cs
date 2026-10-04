@@ -173,11 +173,15 @@ public class LiniiImportRepository
         return Convert.ToInt32(cmd.ExecuteScalar());
     }
 
+    /// <summary>
+    /// Șterge definitiv linia, indiferent de starea de export (permite corectarea în producție: ștergere,
+    /// reimport cu date corecte, reexport — §UI Date importate). Nu afectează fișierul DBF deja generat.
+    /// </summary>
     public bool Sterge(long id)
     {
         using var conn = Data.Database.OpenConnection();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = "DELETE FROM linii_import WHERE id = $id AND id_export IS NULL;";
+        cmd.CommandText = "DELETE FROM linii_import WHERE id = $id;";
         cmd.Parameters.AddWithValue("$id", id);
         return cmd.ExecuteNonQuery() > 0;
     }

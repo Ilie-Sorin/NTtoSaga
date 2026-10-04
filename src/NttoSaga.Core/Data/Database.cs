@@ -79,6 +79,7 @@ public static class Database
                 activ INTEGER NOT NULL DEFAULT 1
             );
             """);
+        EnsureColumnExists(conn, tx, "nomenclator_gestiuni", "prescurtare", "TEXT NOT NULL DEFAULT ''");
 
         ExecuteNonQuery(conn, tx, """
             CREATE TABLE IF NOT EXISTS denumiri_tva (
@@ -108,28 +109,29 @@ public static class Database
 
     private static void SeedNomenclatorGestiuni(SqliteConnection conn, SqliteTransaction tx)
     {
-        (string Denumire, string ContMarfa, string Activitate)[] seed =
+        (string Denumire, string ContMarfa, string Activitate, string Prescurtare)[] seed =
         [
-            ("ANCAFARM1", "371.00001", "01"),
-            ("ANCAFARM2", "371.00002", "02"),
-            ("ANCAFARM3", "371.00003", "03"),
-            ("ANCAFARM4", "371.00004", "04"),
-            ("DEPOZIT ANCA1", "371.00006", "06"),
-            ("DEPOZIT", "371.00009", "09"),
-            ("LABORATOR", "371.00008", "08"),
+            ("ANCAFARM1", "371.00001", "01", "A1"),
+            ("ANCAFARM2", "371.00002", "02", "A2"),
+            ("ANCAFARM3", "371.00003", "03", "A3"),
+            ("ANCAFARM4", "371.00004", "04", "A4"),
+            ("DEPOZIT ANCA1", "371.00006", "06", "DA1"),
+            ("DEPOZIT", "371.00009", "09", "D"),
+            ("LABORATOR", "371.00008", "08", "L"),
         ];
 
-        foreach (var (denumire, contMarfa, activitate) in seed)
+        foreach (var (denumire, contMarfa, activitate, prescurtare) in seed)
         {
             using var cmd = conn.CreateCommand();
             cmd.Transaction = tx;
             cmd.CommandText = """
-                INSERT INTO nomenclator_gestiuni (denumire, cont_marfa, activitate, activ)
-                VALUES ($denumire, $cont, $act, 1);
+                INSERT INTO nomenclator_gestiuni (denumire, cont_marfa, activitate, activ, prescurtare)
+                VALUES ($denumire, $cont, $act, 1, $prescurtare);
                 """;
             cmd.Parameters.AddWithValue("$denumire", denumire);
             cmd.Parameters.AddWithValue("$cont", contMarfa);
             cmd.Parameters.AddWithValue("$act", activitate);
+            cmd.Parameters.AddWithValue("$prescurtare", prescurtare);
             cmd.ExecuteNonQuery();
         }
     }
@@ -183,5 +185,28 @@ public static class Database
         cmd.Transaction = tx;
         cmd.CommandText = sql;
         cmd.ExecuteNonQuery();
+    }
+
+    /// <summary>Migrare simplă pentru baze create cu o schemă mai veche: adaugă coloana dacă nu există deja.</summary>
+    private static void EnsureColumnExists(SqliteConnection conn, SqliteTransaction tx, string tabel, string coloana, string definitieSql)
+    {
+        bool exista;
+        using (var cmd = conn.CreateCommand())
+        {
+            cmd.Transaction = tx;
+            cmd.CommandText = $"PRAGMA table_info({tabel});";
+            using var reader = cmd.ExecuteReader();
+            exista = false;
+            while (reader.Read())
+            {
+                if (string.Equals(reader.GetString(1), coloana, StringComparison.OrdinalIgnoreCase))
+                {
+                    exista = true;
+                    break;
+                }
+            }
+        }
+        if (!exista)
+            ExecuteNonQuery(conn, tx, $"ALTER TABLE {tabel} ADD COLUMN {coloana} {definitieSql};");
     }
 }

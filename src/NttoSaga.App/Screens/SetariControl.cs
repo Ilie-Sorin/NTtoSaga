@@ -75,6 +75,7 @@ public class SetariControl : UserControl, Forms.IEcranNavigabil
         _gridGestiuni.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         _gridGestiuni.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", HeaderText = "Id", Visible = false });
         _gridGestiuni.Columns.Add(new DataGridViewTextBoxColumn { Name = "Denumire", HeaderText = "Denumire" });
+        _gridGestiuni.Columns.Add(new DataGridViewTextBoxColumn { Name = "Prescurtare", HeaderText = "Prescurtare (prefix NrDocument)" });
         _gridGestiuni.Columns.Add(new DataGridViewTextBoxColumn { Name = "ContMarfa", HeaderText = "Cont marfă" });
         _gridGestiuni.Columns.Add(new DataGridViewTextBoxColumn { Name = "Activitate", HeaderText = "Activitate" });
         _gridGestiuni.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Activ", HeaderText = "Activ" });
@@ -98,7 +99,7 @@ public class SetariControl : UserControl, Forms.IEcranNavigabil
         using var dlg = new AdaugaGestiuneCompletDialog();
         if (dlg.ShowDialog(this) == DialogResult.OK)
         {
-            _repo.Adauga(dlg.Denumire, dlg.ContMarfa, dlg.Activitate);
+            _repo.Adauga(dlg.Denumire, dlg.ContMarfa, dlg.Activitate, dlg.Prescurtare);
             IncarcaGestiuni();
             _dupaModificare();
         }
@@ -111,6 +112,7 @@ public class SetariControl : UserControl, Forms.IEcranNavigabil
             if (row.IsNewRow) continue;
             var id = Convert.ToInt64(row.Cells["Id"].Value);
             var denumire = row.Cells["Denumire"].Value?.ToString() ?? "";
+            var prescurtare = row.Cells["Prescurtare"].Value?.ToString() ?? "";
             var cont = row.Cells["ContMarfa"].Value?.ToString() ?? "";
             var activitate = row.Cells["Activitate"].Value?.ToString() ?? "";
             var activ = row.Cells["Activ"].Value is bool b && b;
@@ -119,7 +121,7 @@ public class SetariControl : UserControl, Forms.IEcranNavigabil
                 MessageBox.Show(this, "Denumirea gestiunii nu poate fi goală.", "Date nevalide", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            _repo.Actualizeaza(id, denumire, cont, activitate, activ);
+            _repo.Actualizeaza(id, denumire, cont, activitate, activ, prescurtare);
         }
         FileLogger.Info("Nomenclator gestiuni actualizat din ecranul Setări.");
         MessageBox.Show(this, "Modificările au fost salvate.", "Salvat", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -131,7 +133,7 @@ public class SetariControl : UserControl, Forms.IEcranNavigabil
     {
         _gridGestiuni.Rows.Clear();
         foreach (var g in _repo.ListeazaGestiuni())
-            _gridGestiuni.Rows.Add(g.Id, g.Denumire, g.ContMarfa, g.Activitate, g.Activ);
+            _gridGestiuni.Rows.Add(g.Id, g.Denumire, g.Prescurtare, g.ContMarfa, g.Activitate, g.Activ);
     }
 
     // ---- Tab Denumiri TVA ----
